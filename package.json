@@ -1,0 +1,27 @@
+{
+  "name": "jason-douban-trailer",
+  "version": "1.0.0",
+  "description": "豆瓣项目",
+  "main": "server/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jason-live/jason-douban-trailer.git"
+  },
+  "keywords": [
+    "douban",
+    "trailer"
+  ],
+  "author": "jasonlive",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jason-live/jason-douban-trailer/issues"
+  },
+  "homepage": "https://github.com/jason-live/jason-douban-trailer#readme",
+  "dependencies": {
+    "koa": "^2.7.0"
+  }
+}
