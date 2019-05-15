@@ -40,13 +40,13 @@ const sleep = time => new Promise((resolve) => {
       items.each((index, item) => {
         let it = $(item);
         console.log(it.find('img').attr('src'));
-        let doubanID = it.find('div').data('id');
+        let doubanId = it.find('div').data('id');
         let title = it.find('.title').text();
         let rate = Number(it.find('.rate').text());
         let poster = it.find('img').attr('src').replace('s_ratio', 'l_ratio');
 
         links.push({
-          doubanID,
+          doubanId,
           title,
           rate,
           poster,
