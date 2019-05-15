@@ -1,38 +1,105 @@
 // http://api.douban.com/v2/movie/subject/1764796
 const rp = require('request-promise-native');
+const mongoose = require('mongoose');
+const Movie = mongoose.model('Movie');
+const Category = mongoose.model('Category');
 
 async function fetchMovie(item) {
   const url = `http://api.douban.com/v2/movie/subject/${item.doubanId}`;
   const res = await rp(url);
 
-  return res;
+  let body = '';
+
+  try {
+    body = JSON.parse(res);
+  } catch (error) {
+    console.log(error);
+  }
+
+  return body;
 }
 
 ; (async () => {
-  let movies = [
-    {
-      doubanId: 3914513,
-      title: '马戏之王',
-      rate: 7.3,
-      poster: 'https://img1.doubanio.com/view/photo/l_ratio_poster/public/p2497576479.jpg'
-    },
-    {
-      doubanId: 27593529,
-      title: '绅士联盟',
-      rate: 9.3,
-      poster: 'https://img1.doubanio.com/view/photo/l_ratio_poster/public/p2508069159.jpg'
-    }
-  ]
+  let movies = await Movie.find({
+    $or: [
+      { summary: { $exists: false } },
+      { summary: null },
+      { summary: '' },
+      { title: '' },
+    ]
+  });
 
-  movies.map(async movie => {
+  console.log(movies);
+
+  for (let i = 0; i < [movies[0]].length; i++) {
+    const movie = movies[i];
     let movieData = await fetchMovie(movie);
 
-    try {
-      movieData = JSON.parse(movieData);
-      console.log(movieData.tags);
-      console.log(movieData.summary);
-    } catch (err) {
-      console.log(err);
+    if (movieData) {
+      let tags = movieData.tags || [];
+      movie.tags = movieData.tags || [];
+      movie.summary = movieData.summary || '';
+      movie.title = movieData.alt_title || movieData.title || '';
+      movie.rowTitle = movieData.title || '';
+
+      if (movieData.attrs) {
+        movie.movieTypes = movieData.attrs.movie_type || [];
+
+        for (let i = 0; i < movie.movieTypes.length; i++) {
+          const item = movie.movieTypes[i];
+          let cat = await Category.findOne({
+            name: item,
+          });
+          if (!cat) {
+            cat = new Category({
+              name: item,
+              movies: [movie._id],
+            });
+          } else {
+            if (cat.movies.indexOf(movie._id) === -1) {
+              cat.movies.push(movie._id);
+            };
+          };
+
+          await cat.save();
+
+          if (!movie.category) {
+            movie.category.push(cat._id);
+          } else {
+            if (movie.category.indexOf(cat._id) === 0) {
+              movie.category.push(cat._id);
+            }
+          }
+        };
+
+        let dates = movieData.attrs.pubdate || [];
+        let pubdates = [];
+        dates.map(item => {
+          if (item && item.split('(').length > 0) {
+            let parts = item.split('(');
+            let date = parts[0];
+            let country = '未知';
+
+            if (parts[1]) {
+              country = parts[1].split(')')[0];
+            };
+
+            pubdates.push({
+              date: new Date(date),
+              country,
+            });
+          };
+        });
+
+        movie.pubdate = pubdates;
+      };
+
+      tags.forEach(tag => {
+        movie.tags.push(tag.name);
+      });
+
+      await movie.save();
     };
-  });
+  };
+
 })();
