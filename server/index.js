@@ -3,6 +3,7 @@ const views = require('koa-views');
 const { resolve } = require('path');
 const { connect, initSchemas, initAdmin } = require('./database/init');
 const mongoose = require('mongoose');
+const router = require('./routes');
 
 const app = new Koa();
 
@@ -16,6 +17,10 @@ const app = new Koa();
   // require('./tasks/trailer');
   // require('./tasks/qiniu');
 })();
+
+app
+  .use(router.routes())
+  .use(router.allowedMethods());
 
 app.use(views(resolve(__dirname, './views'), {
   extension: 'pug',
