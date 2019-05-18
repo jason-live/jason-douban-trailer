@@ -1,14 +1,11 @@
 const Router = require('koa-router');
 const mongoose = require('mongoose');
 
-const router = new Router();
+const { controller, get } = require('../lib/decorator');
 
 @controller('/api/v0/movies')
 export class movieController {
   @get('/')
-  @login
-  @admin(['developer'])
-  @log
   async getMovies(ctx, next) {
     const movies = await Movie.find({}).sort({
       'meta.createAt': -1,
