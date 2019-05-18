@@ -1,4 +1,3 @@
-const { isArray } = require('util');
 const _ = require('lodash');
 const glob = require('glob');
 
@@ -28,8 +27,8 @@ export class Route {
       this.router[conf.method](routerPath, ...controllers);
     };
 
-    this.app.use(router.routes());
-    this.app.use(router.allowedMethods());
+    this.app.use(this.router.routes());
+    this.app.use(this.router.allowedMethods());
   };
 };
 
