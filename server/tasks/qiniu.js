@@ -2,10 +2,14 @@ const qiniu = require('qiniu')
 const nanoid = require('nanoid')
 const config = require('../config')
 
+const mongoose = require('mongoose');
+const Movie = mongoose.model('Movie');
+
 const bucket = config.qiniu.bucket
 const mac = new qiniu.auth.digest.Mac(config.qiniu.AK, config.qiniu.SK)
 const cfg = new qiniu.conf.Config()
 const client = new qiniu.rs.BucketManager(mac, cfg)
+
 
 const uploadToQiniu = async (url, key) => {
   return new Promise((resolve, reject) => {
@@ -23,17 +27,19 @@ const uploadToQiniu = async (url, key) => {
   })
 }
 
-
 ;(async () => {
-  let movies = [{
-    video: 'http://vt1.doubanio.com/201905052302/0f2807a97bbf60f5b724581266a4b0c5/view/movie/M/402440458.mp4',
-    doubanId: '26100958',
-    poster: 'https://img3.doubanio.com/view/photo/l_ratio_poster/public/p2552058346.jpg',
-    cover: 'https://img3.doubanio.com/img/trailer/medium/2550759113.jpg?'
-  }];
+  let movies = await Movie.find({
+    $or: [
+      { videoKey: { $exists: false }},
+      { videoKey: null },
+      { videoKey: '' }
+    ]
+  });
 
-  movies.map(async movie => {
-    if (movie.video && !movie.key) {
+  for (let i = 0; i < movies.length; i++) {
+    const movie = movies[i];
+    
+    if (movie.video && !movie.videoKey) {
       try {
         console.log('开始传 video')
         let videoData = await uploadToQiniu(movie.video, nanoid() + '.mp4')
@@ -55,20 +61,12 @@ const uploadToQiniu = async (url, key) => {
 
         console.log(movie);
 
-        // {
-        //   video: 'http://vt1.doubanio.com/201905052302/0f2807a97bbf60f5b724581266a4b0c5/view/movie/M/402440458.mp4',
-        //   doubanId: '26100958',
-        //   poster: 'https://img3.doubanio.com/view/photo/l_ratio_poster/public/p2552058346.jpg',
-        //   cover: 'https://img3.doubanio.com/img/trailer/medium/2550759113.jpg?',
-        //   videoKey: 'http://pqgzybcoi.bkt.clouddn.com/6FhZKVUN2HEXDkpxwsOv7.mp4',
-        //   coverKey: 'http://pqgzybcoi.bkt.clouddn.com/nmT4UrOD4beeWPHmLlCH9.png',
-        //   posterKey: 'http://pqgzybcoi.bkt.clouddn.com/0Dp9PC7NidZGbxwox594q.png'
-        // }
+        await movie.save();
 
       } catch (err) {
         console.log(err)
       }
     }
-  })
+  }
 })()
 
