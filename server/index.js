@@ -18,10 +18,6 @@ const app = new Koa();
   // require('./tasks/qiniu');
 })();
 
-app
-  .use(router.routes())
-  .use(router.allowedMethods());
-
 app.use(views(resolve(__dirname, './views'), {
   extension: 'pug',
 }))
