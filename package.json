@@ -5,7 +5,7 @@
   "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/index.js",
+    "start": "rm -rf dist && rm -rf .cache && NODE_ENV=development nodemon ./start.js",
     "build": "rm -rf dist && parcel build src/index.html --no-cache -d dist --public-url /"
   },
   "repository": {
@@ -52,6 +52,7 @@
     "babel-core": "^6.26.3",
     "babel-polyfill": "^6.26.0",
     "cssnext": "^1.8.4",
-    "node-sass": "^4.12.0"
+    "node-sass": "^4.12.0",
+    "nodemon": "^1.19.0"
   }
 }
