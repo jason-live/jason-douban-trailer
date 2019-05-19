@@ -5,8 +5,6 @@ const { connect, initSchemas, initAdmin } = require('./database/init');
 const R = require('ramda');
 const MIDDLEWARES = ['router', 'parcel'];
 
-
-
 const useMiddlewares = (app) => {
   R.map(
     R.compose(
