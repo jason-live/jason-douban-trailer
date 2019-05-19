@@ -1,10 +1,12 @@
+import 'babel-polyfill';
 import React, { Component } from 'react';
 
 export default (loadComponent, placeholder = '正在加载中...') => {
   return class AsyncComponent extends Component {
     unmount = false;
-    constructor(props) {
-      super(props);
+
+    constructor() {
+      super();
       this.state = {
         Child: null,
       }
@@ -14,7 +16,7 @@ export default (loadComponent, placeholder = '正在加载中...') => {
       this.unmount = true;
     }
 
-    async componentDidMount () {
+    componentDidMount = async () => {
       const { default: Child } = await loadComponent();
       if (this.unmount) return;
       this.setState({
