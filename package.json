@@ -54,7 +54,7 @@
     "babel-core": "^6.26.3",
     "babel-polyfill": "^6.26.0",
     "cssnext": "^1.8.4",
-    "node-sass": "^4.12.0",
+    "node-sass": "^7.0.0",
     "nodemon": "^1.19.0"
   }
 }
